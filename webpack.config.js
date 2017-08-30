@@ -9,6 +9,9 @@ var ExtractTextPlugin 	= require("extract-text-webpack-plugin");
 var CommonsChunkPlugin 	= require("webpack/lib/optimize/CommonsChunkPlugin");
 var HtmlWebpackPlugin	= require("html-webpack-plugin");
 
+// 环境变量配置，dev / online
+var WEBPACK_ENV         = process.env.WEBPACK_ENV || 'dev';
+
 var getHtmlConfig = function(name){
 	return {
 			template : './src/view/'+ name +'.html',
@@ -19,7 +22,7 @@ var getHtmlConfig = function(name){
 		}
 }
 
-module.exports = {
+var config = {
 	entry:{
 		"common" : './src/page/common/index.js',
 		"index" : './src/page/index/index.js',
@@ -27,6 +30,7 @@ module.exports = {
 	},
 	output:{
 		path:__dirname + '/dist/',
+		publicPath:'/dist/',
 		// filename:'[name].[chunkhash].js'
 		filename:'js/[name].js'
 	},
@@ -35,10 +39,9 @@ module.exports = {
 	},
 	module : {
 		loaders :[
-			{
-				test : /\.css$/, 
-				loader: ExtractTextPlugin.extract({ fallbackLoader: 'style-loader', loader: 'css-loader' })
-			}
+			{ test : /\.css$/, loader: ExtractTextPlugin.extract({ fallbackLoader: 'style-loader', loader: 'css-loader' })},
+            { test: /\.(gif|png|jpg|woff|svg|eot|ttf)\??.*$/, loader: 'url-loader?limit=100&name=resource/[name].[ext]' },
+            { test: /\.string$/, loader: 'html-loader'}
 		]
 	},
 	plugins: [
@@ -49,6 +52,7 @@ module.exports = {
 		new ExtractTextPlugin('css/[name].css'),
 		new HtmlWebpackPlugin(getHtmlConfig("index")),
 		new HtmlWebpackPlugin(getHtmlConfig("login")),
-
 	]
 }
+
+module.exports = config;
